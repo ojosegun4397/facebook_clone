@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Friends | Facebook{% endblock %}
+{% block content %}
+
+<div class="friends-page">
+  <div class="friends-sidebar">
+    <h2>Friends</h2>
+    <a href="/friends" class="friends-nav active">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/friends" class="friends-nav">
+      <i class="fas fa-user-plus"></i> Friend Requests 
+      <span class="badge">{{ pending|length }}</span>
+    </a>
+    <a href="/friends" class="friends-nav">
+      <i class="fas fa-users"></i> All Friends
+    </a>
+    <a href="/friends" class="friends-nav">
+      <i class="fas fa-user-friends"></i> Suggestions
+    </a>
+  </div>
+
+  <div class="friends-main">
+
+    <!-- Pending Friend Requests -->
+    {% if pending %}
+    <h3 class="friends-section-title">
+      Friend Requests 
+      <span class="badge-inline">{{ pending|length }}</span>
+    </h3>
+    <div class="friends-grid">
+      {% for p in pending %}
+      <div class="friend-card">
+        <img src="{{ url_for('static', filename='images/default.png') }}" 
+             class="friend-card-avatar"/>
+        <div class="friend-card-info">
+          <a href="/profile/{{ p.id }}" class="friend-card-name">
+            {{ p.first_name }} {{ p.last_name }}
+          </a>
+        </div>
+        <div class="friend-card-actions">
+          <form action="/friend/accept/{{ p.id }}" method="POST" style="display:inline">
+            <button class="btn-primary-small">Confirm</button>
+          </form>
+          <form action="/friend/remove/{{ p.id }}" method="POST" style="display:inline">
+            <button class="btn-gray">Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- All Friends -->
+    <h3 class="friends-section-title">
+      Your Friends 
+      <span class="muted">({{ my_friends|length }})</span>
+    </h3>
+    <div class="friends-grid">
+      {% for f in my_friends %}
+      <div class="friend-card">
+        <img src="{{ url_for('static', filename='images/default.png') }}" 
+             class="friend-card-avatar"/>
+        <div class="friend-card-info">
+          <a href="/profile/{{ f.id }}" class="friend-card-name">
+            {{ f.first_name }} {{ f.last_name }}
+          </a>
+        </div>
+        <div class="friend-card-actions">
+          <a href="/profile/{{ f.id }}" class="btn-gray">View Profile</a>
+          <a href="/messages/{{ f.id }}" class="btn-primary-small">Message</a>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% if not my_friends %}
+      <p class="muted">No friends yet. Search for people to add!</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

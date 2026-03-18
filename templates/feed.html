@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block title %}Facebook{% endblock %}
+{% block content %}
+
+<div class="feed-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+    <a href="/profile/{{ me.id }}" class="sidebar-profile-link">
+      <img src="{{ url_for('static', filename='images/default.png') }}" class="sidebar-avatar"/>
+      <span>{{ me.first_name }} {{ me.last_name }}</span>
+    </a>
+    <a href="/friends" class="sidebar-link">
+      <i class="fas fa-user-friends sidebar-icon" style="color:#1877f2"></i> Friends
+    </a>
+    <a href="/messages" class="sidebar-link">
+      <i class="fab fa-facebook-messenger sidebar-icon" style="color:#1877f2"></i> Messenger
+    </a>
+    <a href="#" class="sidebar-link">
+      <i class="fas fa-store sidebar-icon" style="color:#1877f2"></i> Marketplace
+    </a>
+    <a href="#" class="sidebar-link">
+      <i class="fas fa-tv sidebar-icon" style="color:#1877f2"></i> Watch
+    </a>
+    <a href="#" class="sidebar-link">
+      <i class="fas fa-calendar sidebar-icon" style="color:#1877f2"></i> Events
+    </a>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-small">Privacy · Terms · Advertising · Cookies · More · Facebook Clone © 2024</p>
+  </aside>
+
+  <!-- MAIN FEED -->
+  <main class="feed-main">
+
+    <!-- Create Post Box -->
+    <div class="create-post-card">
+      <div class="create-post-top">
+        <img src="{{ url_for('static', filename='images/default.png') }}" class="post-avatar"/>
+        <div class="create-post-input" onclick="document.getElementById('post-modal').style.display='flex'">
+          What's on your mind, {{ me.first_name }}?
+        </div>
+      </div>
+      <div class="create-post-actions">
+        <button class="post-action-btn" onclick="document.getElementById('post-modal').style.display='flex'">
+          <i class="fas fa-photo-video" style="color:#45bd62"></i> Photo/Video
+        </button>
+        <button class="post-action-btn" onclick="openFeelingModal()">
+          <i class="fas fa-smile" style="color:#f7b928"></i> Feeling/Activity
+        </button>
+        <button class="post-action-btn">
+          <i class="fas fa-map-marker-alt" style="color:#f5533d"></i> Check in
+        </button>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    {% for post in posts %}
+    <div class="post-card" id="post-{{ post.id }}">
+      <div class="post-header">
+        <a href="/profile/{{ post.user_id }}">
+          <img src="{{ url_for('static', filename='images/default.png') }}" class="post-avatar"/>
+        </a>
+        <div class="post-meta">
+          <a href="/profile/{{ post.user_id }}" class="post-author-name">
+            {{ post.author.first_name }} {{ post.author.last_name }}
+          </a>
+          {% if post.feeling %}
+            <span class="post-feeling"> — is feeling {{ post.feeling }}</span>
+          {% endif %}
+          <div class="post-time">
+            <i class="fas fa-globe-americas"></i>
+            {{ post.created_at[:16].replace('T',' ') }}
+          </div>
+        </div>
+        {% if post.user_id == me.id %}
+        <div class="post-menu">
+          <button class="post-menu-btn" onclick="toggleMenu({{ post.id }})">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+          <div class="post-dropdown" id="menu-{{ post.id }}">
+            <form method="POST" action="/post/delete/{{ post.id }}">
+              <button type="submit" class="dropdown-item danger">
+                <i class="fas fa-trash"></i> Delete Post
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="post-content">{{ post.content }}</div>
+
+      <div class="post-stats">
+        <span class="like-stat">
+          <span class="like-emoji">👍</span>
+          <span id="like-count-{{ post.id }}">{{ post.like_count }}</span>
+        </span>
+        <span class="comment-stat" onclick="toggleComments({{ post.id }})">
+          {{ post.comment_count }} Comment{% if post.comment_count != 1 %}s{% endif %}
+        </span>
+      </div>
+
+      <div class="post-actions-bar">
+        <button class="action-btn {% if post.user_liked %}liked{% endif %}" 
+                onclick="toggleLike({{ post.id }}, this)" 
+                id="like-btn-{{ post.id }}">
+          <i class="{% if post.user_liked %}fas{% else %}far{% endif %} fa-thumbs-up"></i>
+          <span>Like</span>
+        </button>
+        <button class="action-btn" onclick="toggleComments({{ post.id }})">
+          <i class="far fa-comment"></i> Comment
+        </button>
+        <button class="action-btn">
+          <i class="fas fa-share"></i> Share
+        </button>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section" id="comments-{{ post.id }}" style="display:none">
+        {% for c in post.comments %}
+        <div class="comment">
+          <img src="{{ url_for('static', filename='images/default.png') }}" class="comment-avatar"/>
+          <div class="comment-bubble">
+            <span class="comment-name">{{ c.first_name }} {{ c.last_name }}</span>
+            <p>{{ c.content }}</p>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="add-comment">
+          <img src="{{ url_for('static', filename='images/default.png') }}" class="comment-avatar"/>
+          <div class="comment-input-row">
+            <input type="text" 
+                   placeholder="Write a comment..." 
+                   class="comment-input"
+                   id="comment-input-{{ post.id }}"
+                   onkeypress="submitComment(event, {{ post.id }})"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-posts">
+      <i class="fas fa-newspaper" style="font-size:3rem;color:#ccc"></i>
+      <p>No posts yet. Add friends and start posting!</p>
+    </div>
+    {% endfor %}
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+
+    {% if requests_count > 0 %}
+    <div class="sidebar-section">
+      <h4 class="sidebar-title">Friend Requests 
+        <span class="badge-inline">{{ requests_count }}</span>
+      </h4>
+      <a href="/friends" class="sidebar-link">View all requests →</a>
+    </div>
+    {% endif %}
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-header">
+        <h4 class="sidebar-title">People you may know</h4>
+        <a href="/friends" class="sidebar-see-all">See all</a>
+      </div>
+      {% for s in suggestions %}
+      <div class="suggestion-card">
+        <img src="{{ url_for('static', filename='images/default.png') }}" class="suggestion-avatar"/>
+        <div class="suggestion-info">
+          <a href="/profile/{{ s.id }}" class="suggestion-name">
+            {{ s.first_name }} {{ s.last_name }}
+          </a>
+          <form action="/friend/request/{{ s.id }}" method="POST" style="margin-top:4px">
+            <button type="submit" class="btn-add-friend">Add Friend</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if notifications %}
+    <div class="sidebar-section">
+      <h4 class="sidebar-title">Recent Notifications</h4>
+      {% for n in notifications[:5] %}
+      <div class="notif-item {% if not n.read %}notif-unread{% endif %}">
+        <img src="{{ url_for('static', filename='images/default.png') }}" class="notif-avatar"/>
+        <div class="notif-text">
+          <strong>{{ n.first_name }} {{ n.last_name }}</strong>
+          {% if n.type == 'like' %} liked your post
+          {% elif n.type == 'comment' %} commented on your post
+          {% elif n.type == 'friend_request' %} sent you a friend request
+          {% elif n.type == 'friend_accepted' %} accepted your friend request
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </aside>
+</div>
+
+<!-- CREATE POST MODAL -->
+<div id="post-modal" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Create Post</h3>
+      <button class="modal-close" onclick="document.getElementById('post-modal').style.display='none'">✕</button>
+    </div>
+    <div class="modal-user">
+      <img src="{{ url_for('static', filename='images/default.png') }}" class="post-avatar"/>
+      <div>
+        <strong>{{ me.first_name }} {{ me.last_name }}</strong>
+        <div class="privacy-select"><i class="fas fa-globe-americas"></i> Public ▾</div>
+      </div>
+    </div>
+    <form action="/post" method="POST">
+      <textarea name="content" class="post-textarea" 
+                placeholder="What's on your mind, {{ me.first_name }}?" 
+                rows="5" autofocus></textarea>
+      <input type="hidden" name="feeling" id="selected-feeling"/>
+      <div class="feeling-chips" id="feeling-chips"></div>
+      <div class="modal-actions-row">
+        <span class="modal-add-label">Add to your post</span>
+        <div class="modal-icons">
+          <button type="button" title="Photo">
+            <i class="fas fa-photo-video" style="color:#45bd62"></i>
+          </button>
+          <button type="button" title="Feeling" onclick="openFeelingModal()">
+            <i class="fas fa-smile" style="color:#f7b928"></i>
+          </button>
+          <button type="button" title="Location">
+            <i class="fas fa-map-marker-alt" style="color:#f5533d"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary btn-full btn-post">Post</button>
+    </form>
+  </div>
+</div>
+
+<!-- FEELING MODAL -->
+<div id="feeling-modal" class="modal-overlay" style="display:none" onclick="closeFeelingModal(event)">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-header">
+      <h3>How are you feeling?</h3>
+      <button class="modal-close" onclick="document.getElementById('feeling-modal').style.display='none'">✕</button>
+    </div>
+    <div class="feeling-grid">
+      {% for f in ['😊 happy','😢 sad','😍 loved','😠 angry','😎 cool','🎉 excited','😴 tired','🤒 sick','💪 motivated','😇 blessed'] %}
+      <button class="feeling-btn" onclick="selectFeeling('{{ f }}')">{{ f }}</button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  {% for post in posts %}
+    {% if post.comments %}
+      document.getElementById('comments-{{ post.id }}').style.display = 'block';
+    {% endif %}
+  {% endfor %}
+});
+</script>
+{% endblock %}

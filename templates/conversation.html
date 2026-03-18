@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{{ other.first_name }} {{ other.last_name }} | Messenger{% endblock %}
+{% block content %}
+
+<div class="messenger-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="messenger-sidebar">
+    <div class="messenger-header">
+      <h2>Chats</h2>
+    </div>
+    <a href="/messages/{{ other.id }}" class="convo-item active">
+      <img src="{{ url_for('static', filename='images/default.png') }}" 
+           class="convo-avatar"/>
+      <div class="convo-info">
+        <span class="convo-name">{{ other.first_name }} {{ other.last_name }}</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="messenger-main">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <img src="{{ url_for('static', filename='images/default.png') }}" 
+           class="convo-avatar"/>
+      <div>
+        <strong>{{ other.first_name }} {{ other.last_name }}</strong>
+        <p class="muted" style="font-size:0.8rem">Active</p>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:12px">
+        <button class="icon-btn" title="Voice Call">
+          <i class="fas fa-phone" style="color:#1877f2"></i>
+        </button>
+        <button class="icon-btn" title="Video Call">
+          <i class="fas fa-video" style="color:#1877f2"></i>
+        </button>
+        <button class="icon-btn" title="Info">
+          <i class="fas fa-info-circle" style="color:#1877f2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages">
+      {% for m in msgs %}
+      <div class="chat-msg {% if m.sender_id == me.id %}chat-msg-me{% else %}chat-msg-them{% endif %}">
+        {% if m.sender_id != me.id %}
+          <img src="{{ url_for('static', filename='images/default.png') }}" 
+               class="comment-avatar"/>
+        {% endif %}
+        <div class="chat-bubble">{{ m.content }}</div>
+      </div>
+      {% else %}
+      <div style="text-align:center;color:#65676b;margin-top:2rem">
+        <i class="fas fa-comment-dots" style="font-size:3rem;color:#ccc"></i>
+        <p style="margin-top:1rem">
+          No messages yet. Say hello to 
+          <strong>{{ other.first_name }}</strong>! 👋
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Message Input -->
+    <form action="/send_message/{{ other.id }}" method="POST" class="chat-form">
+      <button type="button" class="icon-btn">
+        <i class="fas fa-plus" style="color:#1877f2"></i>
+      </button>
+      <button type="button" class="icon-btn">
+        <i class="fas fa-image" style="color:#1877f2"></i>
+      </button>
+      <button type="button" class="icon-btn">
+        <i class="fas fa-thumbs-up" style="color:#1877f2"></i>
+      </button>
+      <input type="text" 
+             name="content" 
+             placeholder="Aa" 
+             class="chat-input" 
+             autofocus/>
+      <button type="submit" class="chat-send-btn">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<!-- Auto scroll to bottom -->
+<script>
+  var chat = document.getElementById('chat-messages');
+  if(chat) chat.scrollTop = chat.scrollHeight;
+</script>
+
+{% endblock %}

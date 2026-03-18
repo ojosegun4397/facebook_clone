@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Messenger | Facebook{% endblock %}
+{% block content %}
+
+<div class="messenger-layout">
+
+  <!-- LEFT SIDEBAR - Conversation List -->
+  <div class="messenger-sidebar">
+    <div class="messenger-header">
+      <h2>Chats</h2>
+      <button class="icon-btn"><i class="fas fa-edit"></i></button>
+    </div>
+    <div class="messenger-search">
+      <input type="text" placeholder="Search Messenger"/>
+    </div>
+
+    {% for c in convos %}
+    <a href="/messages/{{ c.id }}" 
+       class="convo-item {% if c.unread > 0 %}unread{% endif %}">
+      <img src="{{ url_for('static', filename='images/default.png') }}" 
+           class="convo-avatar"/>
+      <div class="convo-info">
+        <span class="convo-name">{{ c.first_name }} {{ c.last_name }}</span>
+        <span class="convo-preview">{{ c.last_msg or 'No messages yet' }}</span>
+      </div>
+      {% if c.unread > 0 %}
+        <span class="convo-badge">{{ c.unread }}</span>
+      {% endif %}
+    </a>
+    {% else %}
+    <p class="muted" style="padding:1rem">
+      No conversations yet. Message a friend!
+    </p>
+    {% endfor %}
+  </div>
+
+  <!-- RIGHT SIDE - Empty State -->
+  <div class="messenger-main empty-chat">
+    <i class="fab fa-facebook-messenger" style="font-size:4rem;color:#1877f2"></i>
+    <h3>Your Messages</h3>
+    <p>Select a conversation or start a new chat.</p>
+  </div>
+
+</div>
+
+{% endblock %}

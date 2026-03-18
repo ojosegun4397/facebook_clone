@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sign Up | Facebook</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="login-body">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="register-overlay">
+  <div class="register-box">
+    <div class="register-header">
+      <h2>Create a new account</h2>
+      <p>It's quick and easy.</p>
+    </div>
+    <form action="/register" method="POST">
+      <div class="form-row">
+        <input type="text" name="first_name" placeholder="First name" required class="reg-input"/>
+        <input type="text" name="last_name" placeholder="Last name (surname)" required class="reg-input"/>
+      </div>
+      <input type="text" name="email" placeholder="Mobile number or email address" required class="reg-input reg-full"/>
+      <input type="password" name="password" placeholder="New password" required class="reg-input reg-full"/>
+
+      <div class="reg-label">Date of birth <span class="reg-why">?</span></div>
+      <input type="date" name="birthday" class="reg-input reg-full"/>
+
+      <div class="reg-label">Gender <span class="reg-why">?</span></div>
+      <div class="gender-row">
+        <label class="gender-option">
+          <span>Female</span>
+          <input type="radio" name="gender" value="female"/>
+        </label>
+        <label class="gender-option">
+          <span>Male</span>
+          <input type="radio" name="gender" value="male"/>
+        </label>
+        <label class="gender-option">
+          <span>Custom</span>
+          <input type="radio" name="gender" value="custom"/>
+        </label>
+      </div>
+
+      <p class="reg-terms">
+        By clicking Sign Up, you agree to our 
+        <a href="#">Terms</a>, 
+        <a href="#">Privacy Policy</a> and 
+        <a href="#">Cookies Policy</a>.
+      </p>
+
+      <button type="submit" class="btn-signup">Sign Up</button>
+    </form>
+    <div class="reg-divider"></div>
+    <a href="/login" class="btn-outline btn-center">Already have an account?</a>
+  </div>
+</div>
+
+</body>
+</html>

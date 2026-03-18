@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title>{% block title %}Facebook{% endblock %}</title>
+ <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+{% if session.user_id %}
+<nav class="navbar">
+ <div class="nav-left">
+ <a href="/feed" class="nav-logo">
+ <svg width="40" height="40" viewBox="0 0 40 40" fill="white">
+ <path d="M20 2C10.06 2 2 10.06 2 20c0 8.84 6.44 16.17 14.88 17.62V24.88h-4.48V20h4.48v-3.9c0-4.42 2.64-6.87 6.68-6.87 1.93 0 3.95.34 3.95.34v4.34h-2.23c-2.19 0-2.88 1.36-2.88 2.75V20h4.9l-.78 4.88h-4.12v14.74C31.56 36.17 38 28.84 38 20c0-9.94-8.06-18-18-18z"/>
+ </svg>
+ <span>facebook</span>
+ </a>
+ <div class="nav-search">
+ <form action="/search" method="get">
+ <i class="fas fa-search"></i>
+ <input type="text" name="q" placeholder="Search Facebook" value="{{ request.args.get('q','') }}"/>
+ </form>
+ </div>
+ </div>
+
+ <div class="nav-center">
+ <a href="/feed" class="nav-tab {% if request.path=='/feed' %}active{% endif %}" title="Home">
+ <i class="fas fa-home"></i>
+ </a>
+ <a href="/friends" class="nav-tab {% if request.path=='/friends' %}active{% endif %}" title="Friends">
+ <i class="fas fa-user-friends"></i>
+ {% if requests_count is defined and requests_count > 0 %}
+ <span class="badge">{{ requests_count }}</span>
+ {% endif %}
+ </a>
+ <a href="/messages" class="nav-tab {% if request.path=='/messages' %}active{% endif %}" title="Messenger">
+ <i class="fab fa-facebook-messenger"></i>
+ </a>
+ <a href="/notifications/read" class="nav-tab" title="Notifications">
+ <i class="fas fa-bell"></i>
+ {% if unread_notifs is defined and unread_notifs > 0 %}
+ <span class="badge">{{ unread_notifs }}</span>
+ {% endif %}
+ </a>
+ </div>
+
+ <div class="nav-right">
+ <a href="/profile/{{ session.user_id }}" class="nav-profile-btn">
+ <img src="{{ url_for('static', filename='images/default.png') }}" alt="me" class="nav-avatar"/>
+ <span>{{ session.user_name.split()[0] }}</span>
+ </a>
+ <a href="/logout" class="nav-icon-btn" title="Log Out">
+ <i class="fas fa-sign-out-alt"></i>
+ </a>
+ </div>
+</nav>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+ {% if messages %}
+ <div class="flash-container">
+ {% for category, message in messages %}
+ <div class="flash flash-{{ category }}">{{ message }}
+ <span class="flash-close" onclick="this.parentElement.remove()">✕</span>
+ </div>
+ {% endfor %}
+ </div>
+ {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

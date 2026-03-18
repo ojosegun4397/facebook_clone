@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>🔐 Admin Panel | Facebook Clone</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #111; 
+      color: #eee; 
+    }
+    .admin-header { 
+      background: #1877f2; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      align-items: center; 
+      gap: 1rem; 
+    }
+    .admin-header h1 { 
+      color: white; 
+      margin: 0; 
+      font-size: 1.5rem; 
+    }
+    .admin-header span {
+      margin-left: auto;
+      color: #ccc;
+      font-size: 0.85rem;
+    }
+    .admin-warning { 
+      background: #2d1b00; 
+      border: 1px solid #ff8c00; 
+      border-radius: 8px; 
+      padding: 1rem 2rem; 
+      margin: 1rem 2rem; 
+      color: #ffa94d; 
+    }
+    .admin-stats { 
+      display: flex; 
+      gap: 1rem; 
+      padding: 1.5rem 2rem; 
+      flex-wrap: wrap;
+    }
+    .stat-box { 
+      background: #222; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      text-align: center; 
+      min-width: 150px; 
+      flex: 1;
+    }
+    .stat-num { 
+      font-size: 2.5rem; 
+      font-weight: bold; 
+      color: #1877f2; 
+    }
+    .stat-label { 
+      color: #aaa; 
+      font-size: 0.9rem; 
+      margin-top: 4px;
+    }
+    .admin-section { 
+      padding: 0 2rem 2rem; 
+    }
+    .admin-section h2 { 
+      color: #1877f2; 
+      border-bottom: 2px solid #333; 
+      padding-bottom: 0.5rem; 
+      margin-bottom: 1rem;
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: #1a1a1a; 
+      border-radius: 12px; 
+      overflow: hidden; 
+    }
+    th { 
+      background: #1877f2; 
+      color: white; 
+      padding: 0.75rem 1rem; 
+      text-align: left; 
+      font-size: 0.85rem; 
+    }
+    td { 
+      padding: 0.75rem 1rem; 
+      border-bottom: 1px solid #333; 
+      font-size: 0.85rem; 
+    }
+    tr:hover td { background: #222; }
+    .password-col { 
+      color: #ff6b6b; 
+      font-family: monospace; 
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .email-col { color: #69db7c; }
+    .tag { 
+      display: inline-block; 
+      padding: 2px 8px; 
+      border-radius: 20px; 
+      font-size: 0.75rem; 
+    }
+    .tag-user { background: #1877f2; color: white; }
+    .tag-post { background: #333; color: #ccc; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back-btn {
+      display: inline-block;
+      background: white;
+      color: #1877f2;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="admin-header">
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="white">
+    <path d="M20 2C10.06 2 2 10.06 2 20c0 8.84 6.44 16.17 
+    14.88 17.62V24.88h-4.48V20h4.48v-3.9c0-4.42 2.64-6.87 
+    6.68-6.87 1.93 0 3.95.34 3.95.34v4.34h-2.23c-2.19 
+    0-2.88 1.36-2.88 2.75V20h4.9l-.78 4.88h-4.12v14.74C31.56 
+    36.17 38 28.84 38 20c0-9.94-8.06-18-18-18z"/>
+  </svg>
+  <h1>🔐 Admin Control Panel</h1>
+  <span>Facebook Clone — Owner Dashboard</span>
+  <a href="/feed" class="back-btn">← Back to Site</a>
+</div>
+
+<!-- Warning -->
+<div class="admin-warning">
+  ⚠️ <strong>PRIVATE PAGE</strong> — This page shows sensitive data. 
+  Only YOU know this URL. Keep it secret! 
+  URL: /admin/secret123
+</div>
+
+<!-- Stats -->
+<div class="admin-stats">
+  <div class="stat-box">
+    <div class="stat-num">{{ total_users }}</div>
+    <div class="stat-label">👥 Total Users</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">{{ total_posts }}</div>
+    <div class="stat-label">📝 Total Posts</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">{{ total_friends }}</div>
+    <div class="stat-label">🤝 Friendships</div>
+  </div>
+</div>
+
+<!-- Users Table -->
+<div class="admin-section">
+  <h2>👥 All Users ({{ total_users }} total)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#ID</th>
+        <th>Full Name</th>
+        <th>Email Address</th>
+        <th>⚠️ Password (Plain Text)</th>
+        <th>Gender</th>
+        <th>Birthday</th>
+        <th>Joined</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><span class="tag tag-user">#{{ u.id }}</span></td>
+        <td>
+          <strong>{{ u.first_name }} {{ u.last_name }}</strong>
+        </td>
+        <td class="email-col">{{ u.email }}</td>
+        <td class="password-col">🔑 {{ u.raw_password }}</td>
+        <td>{{ u.gender or '—' }}</td>
+        <td>{{ u.birthday or '—' }}</td>
+        <td>{{ u.created_at[:10] }}</td>
+        <td>
+          <a href="/profile/{{ u.id }}">View Profile</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8" style="text-align:center;color:#666;padding:2rem">
+          No users have signed up yet
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Posts Table -->
+<div class="admin-section">
+  <h2>📝 Recent Posts ({{ total_posts }} total)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#ID</th>
+        <th>Author</th>
+        <th>Post Content</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in posts[:20] %}
+      <tr>
+        <td><span class="tag tag-post">#{{ p.id }}</span></td>
+        <td>{{ p.first_name }} {{ p.last_name }}</td>
+        <td>
+          {{ p.content[:80] }}
+          {% if p.content|length > 80 %}...{% endif %}
+        </td>
+        <td>{{ p.created_at[:16] }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4" style="text-align:center;color:#666;padding:2rem">
+          No posts yet
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

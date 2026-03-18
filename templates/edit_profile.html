@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile | Facebook{% endblock %}
+{% block content %}
+
+<div class="edit-profile-page">
+  <div class="edit-profile-card">
+
+    <h2>Edit Profile</h2>
+
+    <form action="/edit_profile" method="POST">
+
+      <!-- Profile Picture Section -->
+      <div style="text-align:center;margin-bottom:24px">
+        <img src="{{ url_for('static', filename='images/default.png') }}" 
+             style="width:100px;height:100px;border-radius:50%;border:3px solid #1877f2"/>
+        <div style="margin-top:8px">
+          <button type="button" class="btn-gray">
+            <i class="fas fa-camera"></i> Change Photo
+          </button>
+        </div>
+      </div>
+
+      <!-- Name (Read Only) -->
+      <div class="edit-section">
+        <label>First Name</label>
+        <input type="text" 
+               value="{{ me.first_name }}" 
+               class="edit-textarea" 
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+
+      <div class="edit-section">
+        <label>Last Name</label>
+        <input type="text" 
+               value="{{ me.last_name }}" 
+               class="edit-textarea"
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+
+      <!-- Email (Read Only) -->
+      <div class="edit-section">
+        <label>Email</label>
+        <input type="text" 
+               value="{{ me.email }}" 
+               class="edit-textarea"
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+
+      <!-- Bio (Editable) -->
+      <div class="edit-section">
+        <label>Bio</label>
+        <textarea name="bio" 
+                  rows="4" 
+                  class="edit-textarea" 
+                  placeholder="Tell people about yourself...">{{ me.bio }}</textarea>
+      </div>
+
+      <!-- Birthday (Read Only) -->
+      {% if me.birthday %}
+      <div class="edit-section">
+        <label>Birthday</label>
+        <input type="text" 
+               value="{{ me.birthday }}" 
+               class="edit-textarea"
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+      {% endif %}
+
+      <!-- Gender (Read Only) -->
+      {% if me.gender %}
+      <div class="edit-section">
+        <label>Gender</label>
+        <input type="text" 
+               value="{{ me.gender|capitalize }}" 
+               class="edit-textarea"
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+      {% endif %}
+
+      <!-- Joined Date -->
+      <div class="edit-section">
+        <label>Member Since</label>
+        <input type="text" 
+               value="{{ me.created_at[:10] }}" 
+               class="edit-textarea"
+               style="padding:10px;border-radius:8px;border:1px solid #ced0d4;width:100%"
+               readonly/>
+      </div>
+
+      <!-- Buttons -->
+      <div class="edit-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+        <a href="/profile/{{ me.id }}" class="btn-gray">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

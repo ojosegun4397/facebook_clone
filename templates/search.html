@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Search Results | Facebook{% endblock %}
+{% block content %}
+
+<div class="search-page">
+  <div class="search-page-inner">
+
+    <!-- Search Header -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <i class="fas fa-search" style="font-size:1.5rem;color:#1877f2"></i>
+      <h2>Search Results for "{{ q }}"</h2>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="btn-primary-small">
+        <i class="fas fa-users"></i> People
+      </button>
+      <button class="btn-gray">
+        <i class="fas fa-newspaper"></i> Posts
+      </button>
+      <button class="btn-gray">
+        <i class="fas fa-store"></i> Pages
+      </button>
+      <button class="btn-gray">
+        <i class="fas fa-users"></i> Groups
+      </button>
+    </div>
+
+    <!-- Results -->
+    {% if results %}
+    <div class="search-results-grid">
+      {% for r in results %}
+      <div class="search-result-card">
+        <img src="{{ url_for('static', filename='images/default.png') }}" 
+             class="search-avatar"/>
+        <div class="search-info">
+          <a href="/profile/{{ r.id }}" class="search-name">
+            {{ r.first_name }} {{ r.last_name }}
+          </a>
+          <p class="muted" style="font-size:0.85rem;margin-top:2px">
+            <i class="fas fa-user"></i> Facebook User
+          </p>
+        </div>
+        <div class="search-actions">
+          <a href="/profile/{{ r.id }}" class="btn-gray">
+            <i class="fas fa-user"></i> View Profile
+          </a>
+          <form action="/friend/request/{{ r.id }}" 
+                method="POST" style="display:inline">
+            <button class="btn-primary-small">
+              <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+          </form>
+          <a href="/messages/{{ r.id }}" class="btn-gray">
+            <i class="fab fa-facebook-messenger"></i> Message
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% elif q %}
+    <!-- No Results -->
+    <div class="no-posts">
+      <i class="fas fa-search" style="font-size:3rem;color:#ccc"></i>
+      <p style="margin-top:1rem;font-size:1.1rem">
+        No results found for "<strong>{{ q }}</strong>"
+      </p>
+      <p class="muted" style="margin-top:0.5rem">
+        Try searching for a different name or email address
+      </p>
+    </div>
+
+    {% else %}
+    <!-- Empty Search -->
+    <div class="no-posts">
+      <i class="fas fa-search" style="font-size:3rem;color:#ccc"></i>
+      <p style="margin-top:1rem">Type a name above to search for people</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

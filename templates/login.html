@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Facebook - Log in or sign up</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="login-body">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}
+          <span class="flash-close" onclick="this.parentElement.remove()">✕</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="login-page">
+  <div class="login-left">
+    <div class="fb-logo">
+      <svg width="60" height="60" viewBox="0 0 40 40" fill="#1877f2">
+        <path d="M20 2C10.06 2 2 10.06 2 20c0 8.84 6.44 16.17 14.88 17.62V24.88h-4.48V20h4.48v-3.9c0-4.42 2.64-6.87 6.68-6.87 1.93 0 3.95.34 3.95.34v4.34h-2.23c-2.19 0-2.88 1.36-2.88 2.75V20h4.9l-.78 4.88h-4.12v14.74C31.56 36.17 38 28.84 38 20c0-9.94-8.06-18-18-18z"/>
+      </svg>
+      <h1>facebook</h1>
+    </div>
+    <p class="login-tagline">Connect with friends and the world around you on Facebook.</p>
+  </div>
+
+  <div class="login-right">
+    <form class="login-form" action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email address or phone number" required class="login-input"/>
+      <input type="password" name="password" placeholder="Password" required class="login-input"/>
+      <button type="submit" class="btn-primary btn-full btn-large">Log In</button>
+      <a href="/login" class="forgot-link">Forgotten password?</a>
+      <div class="login-divider"><span>or</span></div>
+      <button type="button" class="btn-green btn-large" onclick="window.location='/register'">
+        Create new account
+      </button>
+    </form>
+    <p class="login-page-create">
+      <strong>Create a Page</strong> for a celebrity, brand or business.
+    </p>
+  </div>
+</div>
+
+<footer class="login-footer">
+  <div class="footer-links">
+    <a href="#">English (UK)</a> · <a href="#">Privacy</a> · 
+    <a href="#">Terms</a> · <a href="#">Advertising</a> · 
+    <a href="#">About</a>
+  </div>
+  <p>Facebook © 2024 · Built with Flask 🐍</p>
+</footer>
+
+</body>
+</html>
