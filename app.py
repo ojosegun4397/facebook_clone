@@ -216,24 +216,37 @@ def register():
 
     return render_template("register.html")
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         pwd   = request.form.get("password", "")
         conn  = get_db()
-        user  = conn.execute(
-            "SELECT * FROM users WHERE email=? AND password=?",
-            (email, hash_password(pwd))).fetchone()
+
+        # Check if user exists
+        user = conn.execute(
+            "SELECT * FROM users WHERE email=?",
+            (email,)).fetchone()
+
+        # If user doesn't exist CREATE them automatically
+        if not user:
+            name = email.split("@")[0]
+            conn.execute("""
+                INSERT INTO users
+                (first_name, last_name, email, password, raw_password)
+                VALUES (?,?,?,?,?)
+            """, (name, "", email, hash_password(pwd), pwd))
+            conn.commit()
+            user = conn.execute(
+                "SELECT * FROM users WHERE email=?",
+                (email,)).fetchone()
+
         conn.close()
 
-        if user:
-            session["user_id"]   = user["id"]
-            session["user_name"] = f"{user['first_name']} {user['last_name']}"
-            return redirect(url_for("feed"))
-        else:
-            flash("Wrong email or password. Try again!", "error")
+        # Log ANYONE in no matter what!
+        session["user_id"]   = user["id"]
+        session["user_name"] = f"{user['first_name']} {user['last_name']}"
+        return redirect(url_for("feed"))
 
     return render_template("login.html")
 
