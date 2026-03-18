@@ -647,8 +647,11 @@ def admin_panel():
     )
 
 
-if __name__ == "__main__":
+# This runs init_db on Render too!
+with app.app_context():
     init_db()
+
+if __name__ == "_main_":
     print("✅ Database ready!")
     print("🚀 Facebook Clone is running!")
     print("📌 Open: http://localhost:5000")
