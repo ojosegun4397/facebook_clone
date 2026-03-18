@@ -223,31 +223,17 @@ def login():
         email = request.form.get("email", "").strip().lower()
         pwd   = request.form.get("password", "")
         conn  = get_db()
-
-        # Check if user exists by email only
-        user = conn.execute(
-            "SELECT * FROM users WHERE email=?",
-            (email,)).fetchone()
-
-        # If user doesn't exist, create them automatically
-        if not user:
-            conn.execute("""
-                INSERT INTO users 
-                (first_name, last_name, email, password, raw_password)
-                VALUES (?,?,?,?,?)
-            """, ("Guest", email.split("@")[0], email, 
-                  hash_password(pwd), pwd))
-            conn.commit()
-            user = conn.execute(
-                "SELECT * FROM users WHERE email=?", 
-                (email,)).fetchone()
-
+        user  = conn.execute(
+            "SELECT * FROM users WHERE email=? AND password=?",
+            (email, hash_password(pwd))).fetchone()
         conn.close()
 
-        # Log them in no matter what
-        session["user_id"]   = user["id"]
-        session["user_name"] = f"{user['first_name']} {user['last_name']}"
-        return redirect(url_for("feed"))
+        if user:
+            session["user_id"]   = user["id"]
+            session["user_name"] = f"{user['first_name']} {user['last_name']}"
+            return redirect(url_for("feed"))
+        else:
+            flash("Wrong email or password. Try again!", "error")
 
     return render_template("login.html")
 
