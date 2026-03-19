@@ -669,4 +669,5 @@ if __name__ == "_main_":
     print("🚀 Facebook Clone is running!")
     print("📌 Open: http://localhost:5000")
     print(f"🔐 Admin: http://localhost:5000/admin/{ADMIN_SECRET}")
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)
